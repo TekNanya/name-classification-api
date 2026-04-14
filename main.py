@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 
 app = FastAPI()
 
-# ✅ Enable CORS (required)
 @app.middleware("http")
 async def add_cors_headers(request, call_next):
     response = await call_next(request)
@@ -16,7 +15,6 @@ async def add_cors_headers(request, call_next):
 @app.get("/api/classify")
 def classify_name(name: str = Query(default=None)):
 
-    # ❌ Missing or empty name
     if name is None or name.strip() == "":
         return JSONResponse(
             status_code=400,
@@ -24,7 +22,7 @@ def classify_name(name: str = Query(default=None)):
         )
 
     try:
-        # 🌍 Call Genderize API
+       
         response = requests.get(
             "https://api.genderize.io/",
             params={"name": name},
@@ -43,7 +41,7 @@ def classify_name(name: str = Query(default=None)):
         probability = data.get("probability")
         count = data.get("count")
 
-        # ❌ Edge case handling
+        
         if gender is None or count == 0:
             return JSONResponse(
                 status_code=422,
@@ -53,10 +51,10 @@ def classify_name(name: str = Query(default=None)):
                 }
             )
 
-        # 🔥 Confidence logic
+      
         is_confident = (probability >= 0.7) and (count >= 100)
 
-        # ⏱️ Proper UTC ISO 8601
+    
         processed_at = datetime.now(timezone.utc).isoformat()
 
         return {
@@ -65,7 +63,7 @@ def classify_name(name: str = Query(default=None)):
                 "name": name.lower(),
                 "gender": gender,
                 "probability": probability,
-                "sample_size": count,  # ✅ renamed
+                "sample_size": count, 
                 "is_confident": is_confident,
                 "processed_at": processed_at
             }
