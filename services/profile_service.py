@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
-from uuid7 import uuid7
+from uuid import uuid4
 
 from clients.genderize import get_gender
 from clients.agify import get_age
 from clients.nationalize import get_country
+from models import Profile
 
 
 def age_group(age: int):
@@ -42,7 +43,7 @@ async def build_profile(db, name: str):
     top = max(countries, key=lambda x: x["probability"])
 
     profile = Profile(
-        id=str(uuid7()),
+      id = str(uuid4()),
         name=name,
 
         gender=g["gender"],
